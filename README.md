@@ -1,5 +1,5 @@
 # 自用脚本
-- 1、电信 china_telecom.py、telecom_live_lotter.py  
+- 1、电信营业厅
 原脚本作者：[**limoruirui**](https://github.com/limoruirui/misaka)  
 增加多用户运行、新增TELECOM_LIVEINFO环境变量  
     - 环境变量：  
