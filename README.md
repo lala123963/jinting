@@ -8,15 +8,12 @@
         - TELECOM_LIVEINFO='直播间获取链接'  选填，若出现内置的获取链接404，则需填入该变量，自己抓包或询问大佬  
     - 安装依赖
   ```
-  _安装依赖时失败时 如果日志内有提示 gcc not found 的关键字 则进入docker容器中 依次执行
+  打开面板-依赖管理-新建依赖 依赖类型选 python3
+  安装requests、pycryptodome这2个依赖
+  
+  安装 pycryptodome 依赖时失败时 如果日志内有提示 gcc not found 的关键字 则进入docker容器中 依次执行
   $ apk update
   $ apk add build-base 
-  此时在docker容器内执行 gcc --version 若正确显示版本信息 则可继续安装_
+  此时在docker容器内执行 gcc --version 若正确显示版本信息 则可继续安装 pycryptodome
   
-  第一种方法: 在github复制requirements.txt内的所有东西 
-  打开面板-依赖管理-新建依赖 依赖类型选 python3 自动拆分选 是 把复制的东西粘贴在名称内 确定即可
-  
-  第二种方法: 进入容器中 依次执行
-  $ cd data/scripts/limoruirui_misaka
-  $ wget https://raw.githubusercontent.com/limoruirui/misaka/master/requirements.txt
-  $ pip3 install -r requirements.txt
+
