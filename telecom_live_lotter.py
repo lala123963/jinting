@@ -24,6 +24,7 @@ from asyncio import wait, sleep, run
 
 import time
 import requests
+import json
 
 from tools.tool import timestamp, get_environ, print_now
 from tools.send_msg import push
@@ -177,7 +178,7 @@ class TelecomLotter:
 
 
 def get_data():
-    print('正在加载今日数据ing...')    
+    print('正在加载今日数据ing...')
     all_list = []
     code = 1
     for i in range(35):
@@ -213,7 +214,7 @@ def main(phone, password):
     apiType = 1
     try:
         url = telecomLiveInfo
-        data = get(url, timeout=5).json()        
+        data = get(url, timeout=5).json()
     except:
         data = getData
     print(data)
@@ -227,15 +228,15 @@ def main(phone, password):
         print("查询结束 没有近期开播的直播间")
     else:
         telecomLotter = TelecomLotter(phone, password)
-        all_task = [telecomLotter.lotter(liveId, period) for liveId, period in liveListInfo.items()]
-        run(wait(all_task))
+        for liveId, period in liveListInfo.items():
+            run(telecomLotter.lotter(liveId, period))
     now = datetime.now()
     if now.hour == 12 + int(strftime("%z")[2]) and now.minute > 10:
         TelecomLotter(phone, password).find_price()
 
 if __name__ == '__main__':
     getData=get_data()
-    userpass = get_environ("TELECOM_USERPASS") 
+    userpass = get_environ("TELECOM_USERPASS")
     telecomLiveInfo = get_environ("TELECOM_LIVEINFO") if get_environ("TELECOM_LIVEINFO") != '' else 'https://gitcode.net/woshitezhonglang/telecomliveinfo/-/raw/master/telecomLiveInfo.json'
     temp = []
     if userpass == "" :
