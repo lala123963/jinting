@@ -10,7 +10,6 @@
 1. 脚本仅供学习交流使用, 请在下载后24h内删除
 2. 环境变量说明:
     export TELECOM_USERPASS = '手机号1@密码1换行手机号2@密码2 或者 手机号1@密码1&手机号2@密码2'
-    export TELECOM_LIVEINFO='直播间获取链接'  选填，若出现内置的获取链接404，则需填入该变量，自己抓包或询问大佬
 3. 必须登录过 电信营业厅 app的账号才能正常运行
 """
 from re import findall
@@ -220,7 +219,6 @@ def main(phone, password, liveListInfo):
 if __name__ == '__main__':
     data = get_data()
     userpass = get_environ("TELECOM_USERPASS")
-    telecomLiveInfo = get_environ("TELECOM_LIVEINFO") if get_environ("TELECOM_LIVEINFO") != '' else 'https://gitcode.net/woshitezhonglang/telecomliveinfo/-/raw/master/telecomLiveInfo.json'
     temp = []
     if userpass == "" :
         print("未填写相应变量 退出")
