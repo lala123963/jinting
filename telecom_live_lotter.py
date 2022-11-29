@@ -205,10 +205,14 @@ def get_data():
 
 def main(phone, password, liveListInfo):
     telecomLotter = TelecomLotter(phone, password)
+    count = 0
+    sLen = len(liveListInfo)
     for liveId, period in liveListInfo.items():
         run(telecomLotter.lotter(liveId, period))
-        print(f"等待30秒进去下一个直播间")
-        time_sleep(30)
+        if not (count == (sLen - 1)):
+            print(f"等待30秒前往下一个直播间")
+            time_sleep(30)
+        count += 1
     now = datetime.now()
     if now.hour == 12 + int(strftime("%z")[2]) and now.minute > 10:
         TelecomLotter(phone, password).find_price()
