@@ -13,6 +13,7 @@
     export TELECOM_LIVEINFO='直播间获取链接'  选填，若出现内置的获取链接404，则需填入该变量，自己抓包或询问大佬
 3. 必须登录过 电信营业厅 app的账号才能正常运行
 """
+import threading
 from re import findall
 from random import randint
 from base64 import b64encode
@@ -170,38 +171,30 @@ class TelecomLotter:
         else:
             print(f"获取奖品信息失败, 接口返回" + str(data))
 
-
-def get_data():
-    print('正在加载今日数据ing...')
-    all_list = []
-    code = 1
-    for i in range(35):
-        if code < 10:
-            code_str = '0' + str(code)
+def get_urls():
+    urls = []
+    for i in range(1, 36):
+        if i < 10:
+            code_str = '0' + str(i)
         else:
-            code_str = str(code)
+            code_str = str(i)
         url = f'https://xbk.189.cn/xbkapi/lteration/index/recommend/anchorRecommend?provinceCode={code_str}'
-        random_phone = f"1537266{randint(1000, 9999)}"
-        headers = {
-            "referer": "https://xbk.189.cn/xbk/newHome?version=9.4.0&yjz=no&l=card&longitude=%24longitude%24&latitude=%24latitude%24&utm_ch=hg_app&utm_sch=hg_sh_shdbcdl&utm_as=xbk_tj&loginType=1",
-            "user-agent": f"CtClient;9.6.1;Android;12;MI12;{b64encode(random_phone[5:11].encode()).decode().strip('=+')}!#!{b64encode(random_phone[0:5].encode()).decode().strip('=+')}"
-        }
-        # print(url)
-        data = requests.get(url, headers=headers).json()
-        body = data["data"]
-        for i in body:
-            if time.strftime('%Y-%m-%d') in i['start_time']:
-                if i not in all_list:
-                    print(i['start_time'],i['nickname'],i['liveId'])
-                    all_list.append(i)
-        code += 1
-    list = {}
-    f = 1
-    for i in all_list:
-        list['liveRoom' + str(f)] = i
-        f += 1
-    print('数据加载完毕')
-    return list
+        urls.append(url)
+    return urls
+
+def get_data(url):
+    random_phone = f"1537266{randint(1000, 9999)}"
+    headers = {
+        "referer": "https://xbk.189.cn/xbk/newHome?version=9.4.0&yjz=no&l=card&longitude=%24longitude%24&latitude=%24latitude%24&utm_ch=hg_app&utm_sch=hg_sh_shdbcdl&utm_as=xbk_tj&loginType=1",
+        "user-agent": f"CtClient;9.6.1;Android;12;SM-G9860;{b64encode(random_phone[5:11].encode()).decode().strip('=+')}!#!{b64encode(random_phone[0:5].encode()).decode().strip('=+')}"
+    }
+    data = get(url, headers=headers).json()
+    body = data["data"]
+    for i in body:
+        if time.strftime('%Y-%m-%d') in i['start_time']:
+            if i not in all_list:
+                print(i['start_time'], i['nickname'], i['liveId'])
+                all_list.append(i)
 
 def main(phone, password, liveListInfo):
     telecomLotter = TelecomLotter(phone, password)
@@ -218,7 +211,6 @@ def main(phone, password, liveListInfo):
         TelecomLotter(phone, password).find_price()
 
 if __name__ == '__main__':
-    data = get_data()
     userpass = get_environ("TELECOM_USERPASS")
     telecomLiveInfo = get_environ("TELECOM_LIVEINFO") if get_environ("TELECOM_LIVEINFO") != '' else 'https://gitcode.net/woshitezhonglang/telecomliveinfo/-/raw/master/telecomLiveInfo.json'
     temp = []
@@ -226,13 +218,32 @@ if __name__ == '__main__':
         print("未填写相应变量 退出")
         exit(0)
     if len(userpass.split('\n')) > 1:
-        print("手机号密码使用 换行 隔开")
+        print("手机号密码使用 换行 隔开\n")
         temp = userpass.split('\n')
     elif len(userpass.split('&')) > 1:
-        print("手机号密码使用 & 隔开")
+        print("手机号密码使用 & 隔开\n")
         temp = userpass.split('&')
     else:
         temp.append(userpass)
+
+    all_list = []
+    urls = get_urls()
+    print('加载今日数据ing...')
+    threads = []
+    for url in urls:
+        threads.append(
+            threading.Thread(target=get_data, args=(url,))
+        )
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+    f = 1
+    data = {}
+    for i in all_list:
+        data['liveRoom' + str(f)] = i
+        f += 1
+    print('数据加载完毕')
 
     apiType = 1
     liveListInfo = {}
