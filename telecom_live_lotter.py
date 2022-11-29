@@ -197,8 +197,9 @@ def get_data():
         body = data["data"]
         for i in body:
             if time.strftime('%Y-%m-%d') in i['start_time']:
-                print(i['start_time'])
-                all_list.append(i)
+                if i not in all_list:
+                    print(i['start_time'],i['nickname'],i['liveId'])
+                    all_list.append(i)
         code += 1
     list = {}
     f = 1
@@ -212,12 +213,6 @@ def get_data():
 
 def main(phone, password):
     apiType = 1
-    try:
-        url = telecomLiveInfo
-        data = get(url, timeout=5).json()
-    except:
-        data = getData
-    print(data)
     liveListInfo = {}
     allLiveInfo = data.values() if apiType == 1 else data["data"]
     for liveInfo in allLiveInfo:
@@ -235,7 +230,6 @@ def main(phone, password):
         TelecomLotter(phone, password).find_price()
 
 if __name__ == '__main__':
-    getData=get_data()
     userpass = get_environ("TELECOM_USERPASS")
     telecomLiveInfo = get_environ("TELECOM_LIVEINFO") if get_environ("TELECOM_LIVEINFO") != '' else 'https://gitcode.net/woshitezhonglang/telecomliveinfo/-/raw/master/telecomLiveInfo.json'
     temp = []
@@ -251,6 +245,7 @@ if __name__ == '__main__':
     else:
         temp.append(userpass)
 
+    data = get_data()
     for i in range(len(temp)) :
         up = temp[i].split('@')
         if len(up) != 2:
