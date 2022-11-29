@@ -125,19 +125,13 @@ class TelecomLotter:
         :return:
         """
         print_now(f"当前执行的直播间id为{liveId}")
-        for i in range(8):
-            # active_code1 查询直播间购物车中的大转盘活动id
-            active_code1 = self.get_action_id(liveId)
-            # active_code2 查询直播间非购物车 而是右上角的大转盘活动id
-            active_code2 = self.get_action_id_other(liveId)
-            if active_code1 is not None or active_code2 is not None:
-                break
-            print(f"此直播间暂无抽奖活动, 等待90秒后再次查询 剩余查询次数{7 - i}")
-            await sleep(90)
-            continue
+        # active_code1 查询直播间购物车中的大转盘活动id
+        active_code1 = self.get_action_id(liveId)
+        # active_code2 查询直播间非购物车 而是右上角的大转盘活动id
+        active_code2 = self.get_action_id_other(liveId)
         if active_code1 is None and active_code2 is None:
             print("查询结束 本直播间暂无抽奖活动")
-            return
+            return -1
         elif active_code1 is None or active_code2 is None:
             active_code = active_code1 if active_code2 is None else active_code2
             active_code_list = [active_code]
@@ -209,9 +203,33 @@ def get_data():
     print('数据加载完毕')
     return list
 
+def main(phone, password, liveListInfo):
+    telecomLotter = TelecomLotter(phone, password)
+    for liveId, period in liveListInfo.items():
+        run(telecomLotter.lotter(liveId, period))
+        print(f"等待30秒进去下一个直播间")
+        time_sleep(30)
+    now = datetime.now()
+    if now.hour == 12 + int(strftime("%z")[2]) and now.minute > 10:
+        TelecomLotter(phone, password).find_price()
 
+if __name__ == '__main__':
+    data = get_data()
+    userpass = get_environ("TELECOM_USERPASS")
+    telecomLiveInfo = get_environ("TELECOM_LIVEINFO") if get_environ("TELECOM_LIVEINFO") != '' else 'https://gitcode.net/woshitezhonglang/telecomliveinfo/-/raw/master/telecomLiveInfo.json'
+    temp = []
+    if userpass == "" :
+        print("未填写相应变量 退出")
+        exit(0)
+    if len(userpass.split('\n')) > 1:
+        print("手机号密码使用 换行 隔开")
+        temp = userpass.split('\n')
+    elif len(userpass.split('&')) > 1:
+        print("手机号密码使用 & 隔开")
+        temp = userpass.split('&')
+    else:
+        temp.append(userpass)
 
-def main(phone, password):
     apiType = 1
     liveListInfo = {}
     allLiveInfo = data.values() if apiType == 1 else data["data"]
@@ -222,37 +240,13 @@ def main(phone, password):
     if len(liveListInfo) == 0:
         print("查询结束 没有近期开播的直播间")
     else:
-        telecomLotter = TelecomLotter(phone, password)
-        for liveId, period in liveListInfo.items():
-            run(telecomLotter.lotter(liveId, period))
-    now = datetime.now()
-    if now.hour == 12 + int(strftime("%z")[2]) and now.minute > 10:
-        TelecomLotter(phone, password).find_price()
-
-if __name__ == '__main__':
-    userpass = get_environ("TELECOM_USERPASS")
-    telecomLiveInfo = get_environ("TELECOM_LIVEINFO") if get_environ("TELECOM_LIVEINFO") != '' else 'https://gitcode.net/woshitezhonglang/telecomliveinfo/-/raw/master/telecomLiveInfo.json'
-    temp = []
-    if userpass == "" :
-        print("未填写相应变量 退出")
-        exit(0)
-    if len(userpass.split('\n')) > 1:
-        print("手机号密码使用换行隔开")
-        temp = userpass.split('\n')
-    elif len(userpass.split('&')) > 1:
-        print("手机号密码使用&隔开")
-        temp = userpass.split('&')
-    else:
-        temp.append(userpass)
-
-    data = get_data()
-    for i in range(len(temp)) :
-        up = temp[i].split('@')
-        if len(up) != 2:
-            print("第" + str(i+1) + "组手机号密码填写有误，请按照 手机号@密码 格式填写")
-            continue
-        phone = up[0]
-        password = up[1]
-        print("===================手机号:"+ phone +"===================")
-        main(phone, password)
+        for i in range(len(temp)):
+            up = temp[i].split('@')
+            if len(up) != 2:
+                print("第" + str(i + 1) + "组手机号密码填写有误，请按照 手机号@密码 格式填写")
+                continue
+            phone = up[0]
+            password = up[1]
+            print("===================手机号:" + phone + "===================")
+            main(phone, password, liveListInfo)
 
