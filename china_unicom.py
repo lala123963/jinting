@@ -33,7 +33,7 @@ from json import dumps
 from tools.encrypt_symmetric import Crypt
 from tools.send_msg import push
 from tools.tool import get_environ, random_sleep
-random_sleep(0, 1600)
+random_sleep(0, 120)
 
 
 """主类"""
