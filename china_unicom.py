@@ -33,7 +33,7 @@ from json import dumps
 from tools.encrypt_symmetric import Crypt
 from tools.send_msg import push
 from tools.tool import get_environ, random_sleep
-random_sleep(0, 120)
+random_sleep(0, 60)
 
 
 """主类"""
@@ -202,7 +202,6 @@ class China_Unicom:
                 sleep(2)
             self.query_score()
         self.query_red()
-        exit(0)
 
 
 if __name__ == "__main__":
