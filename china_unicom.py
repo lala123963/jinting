@@ -223,7 +223,7 @@ if __name__ == "__main__":
     else:
         multi_phone_num.append(temp)
 
-    print("共{}个账号".format(len(multi_phone_num)))
+    print("共{}个账号\n".format(len(multi_phone_num)))
     for phone_num in multi_phone_num:
         print("=================={}==================\n".format(phone_num))
         China_Unicom(phone_num).main()
