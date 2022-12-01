@@ -3,7 +3,7 @@
 原脚本作者：[**limoruirui**](https://github.com/limoruirui/misaka)  
 增加多用户运行、多线程获取直播间  
     - 环境变量：  
-        - TELECOM_USERPASS = '手机号1@密码1换行手机号2@密码2 或者 手机号1@密码1&手机号2@密码2'
+        - TELECOM_USERPASS = '手机号1@密码1&手机号2@密码2'
         - TELECOM_FOOD='给宠物喂食次数 默认为0 不喂食 根据用户在网时长 每天可以喂食5-10次'  
     - 安装依赖
   ```
